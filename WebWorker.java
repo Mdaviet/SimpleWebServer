@@ -159,9 +159,13 @@ private void writeContent(OutputStream os) throws Exception
    while ((text = br.readLine()) != null && (file2.exists() == true)) {
     os.write( br.readLine().getBytes());
     
-    // find and print date strings
+    // find tag and print date strings
     if (text.equals("\t<cs371date>"))
       os.write((df.format(d)).getBytes());
+    
+    // find tags and print server messages
+    if (text.equals("\t<cs371server>"))
+      os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
    }
    
   /*  os.write("<html><head></head><body>\n".getBytes());
