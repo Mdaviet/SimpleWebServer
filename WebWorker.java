@@ -151,6 +151,11 @@ private void writeContent(OutputStream os) throws Exception
         br = new BufferedReader( new FileReader(file2));
     }
     
+    // display 404 error when file does not exist
+   else {
+      System.err.println("File Not Found: " + file2);
+      os.write("HTTP/1.1 404 Not Found\n".getBytes());
+   }
    
    /* try {
    } catch (FileNotFoundException e){
