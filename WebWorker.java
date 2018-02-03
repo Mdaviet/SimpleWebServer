@@ -100,6 +100,16 @@ private void readHTTPRequest(InputStream is)
 **/
 private void writeHTTPHeader(OutputStream os, String contentType) throws Exception
 {
+   // If the file does not exist, give a 404 exception
+   File file2 = new File(file);
+   
+   if (file2.exists() == false) {
+      System.err.println("File Not Found: " + file2);
+      os.write("HTTP/1.1 404 Not Found\n".getBytes());
+   }
+   
+   // If the file can be found, status 200 OK
+   else {
    Date d = new Date();
    DateFormat df = DateFormat.getDateTimeInstance();
    df.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -115,6 +125,7 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
    os.write(contentType.getBytes());
    os.write("\n\n".getBytes()); // HTTP header ends with 2 newlines
    return;
+   }
 }
 
 /**
@@ -132,6 +143,7 @@ private void writeContent(OutputStream os) throws Exception
    if (file2.exists() == true) {
         br = new BufferedReader( new FileReader(file2));
     }
+    
    
    /* try {
    } catch (FileNotFoundException e){
