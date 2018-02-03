@@ -137,6 +137,11 @@ private void writeContent(OutputStream os) throws Exception
 {
     File file2 = new File(file);
     BufferedReader br = null;
+    
+    // Declare date object
+    Date d = new Date();
+    DateFormat df = DateFormat.getDateTimeInstance();
+    df.setTimeZone(TimeZone.getTimeZone("GMT"));
    
    FileReader read = new FileReader(file);
    String text = "";
@@ -150,8 +155,14 @@ private void writeContent(OutputStream os) throws Exception
         
    } */
    
-   while ((text = br.readLine()) != null && (file2.exists() == true))
+   // Read data from routed file
+   while ((text = br.readLine()) != null && (file2.exists() == true)) {
     os.write( br.readLine().getBytes());
+    
+    // find and print date strings
+    if (text.equals("\t<cs371date>"))
+      os.write((df.format(d)).getBytes());
+   }
    
   /*  os.write("<html><head></head><body>\n".getBytes());
    os.write("<h3>My web server works!</h3>\n".getBytes());
