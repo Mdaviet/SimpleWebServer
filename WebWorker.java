@@ -145,13 +145,12 @@ private void writeContent(OutputStream os) throws Exception
     DateFormat df = DateFormat.getDateTimeInstance();
     df.setTimeZone(TimeZone.getTimeZone("GMT"));
    
-   FileReader read = new FileReader(file);
-   String text = "";
    
     
    
    try {
-      if (file2.exists() == true) {
+      FileReader read = new FileReader(file);
+      String text = "";
          br = new BufferedReader( new FileReader(file2));
          // Read data from routed file
          while ((text = br.readLine()) != null && (file2.exists() == true)) {
@@ -168,10 +167,8 @@ private void writeContent(OutputStream os) throws Exception
       }
    } catch (FileNotFoundException e){
        // display 404 error when file does not exist
-      else {
          System.err.println("File Not Found: " + file2);
          os.write("HTTP/1.1 404 Not Found\n".getBytes());
-      }
    } 
    
    
