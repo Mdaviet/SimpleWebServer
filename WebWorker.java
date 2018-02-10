@@ -49,6 +49,7 @@ public WebWorker(Socket s)
 **/
 public void run()
 {
+   
    System.err.println("Handling connection...");
    try {
       InputStream  is = socket.getInputStream();
@@ -164,7 +165,6 @@ private void writeContent(OutputStream os) throws Exception
           if (text.equals("\t<cs371server>"))
             os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
          }
-      }
    } catch (FileNotFoundException e){
        // display 404 error when file does not exist
          System.err.println("File Not Found: " + file2);
