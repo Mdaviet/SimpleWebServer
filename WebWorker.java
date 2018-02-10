@@ -147,33 +147,33 @@ private void writeContent(OutputStream os) throws Exception
    
    FileReader read = new FileReader(file);
    String text = "";
-   if (file2.exists() == true) {
-        br = new BufferedReader( new FileReader(file2));
-    }
-    
-    // display 404 error when file does not exist
-   else {
-      System.err.println("File Not Found: " + file2);
-      os.write("HTTP/1.1 404 Not Found\n".getBytes());
-   }
    
-   /* try {
+    
+   
+   try {
+      if (file2.exists() == true) {
+         br = new BufferedReader( new FileReader(file2));
+         // Read data from routed file
+         while ((text = br.readLine()) != null && (file2.exists() == true)) {
+          os.write( br.readLine().getBytes());
+          
+          // find tag and print date strings
+          if (text.equals("\t<cs371date>"))
+            os.write((df.format(d)).getBytes());
+          
+          // find tags and print server messages
+          if (text.equals("\t<cs371server>"))
+            os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
+         }
+      }
    } catch (FileNotFoundException e){
-        
-   } */
+       // display 404 error when file does not exist
+      else {
+         System.err.println("File Not Found: " + file2);
+         os.write("HTTP/1.1 404 Not Found\n".getBytes());
+      }
+   } 
    
-   // Read data from routed file
-   while ((text = br.readLine()) != null && (file2.exists() == true)) {
-    os.write( br.readLine().getBytes());
-    
-    // find tag and print date strings
-    if (text.equals("\t<cs371date>"))
-      os.write((df.format(d)).getBytes());
-    
-    // find tags and print server messages
-    if (text.equals("\t<cs371server>"))
-      os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
-   }
    
   /*  os.write("<html><head></head><body>\n".getBytes());
    os.write("<h3>My web server works!</h3>\n".getBytes());
