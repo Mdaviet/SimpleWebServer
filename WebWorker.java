@@ -60,6 +60,10 @@ public void run()
       
       if (path.toLowerCase().contains(".gif"))
          contentType = "image/gif";
+      else if (path.toLowerCase().contains(".png"))
+         contentType = "image/png";
+      else if (path.toLowerCase().contains(".jpg"))
+         contentType = "image/jpg";
       else
          contentType = "text/html";
       
