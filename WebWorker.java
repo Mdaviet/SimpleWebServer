@@ -49,13 +49,19 @@ public WebWorker(Socket s)
 **/
 public void run()
 {
+   String contentType = "";
+   String path = "";
    
    System.err.println("Handling connection...");
    try {
       InputStream  is = socket.getInputStream();
       OutputStream os = socket.getOutputStream();
-      readHTTPRequest(is);
-      writeHTTPHeader(os,"text/html");
+      path = readHTTPRequest(is);
+      
+      if (path.toLowerCase().contains(".gif"))
+         contentType = "image/gif";
+      
+      writeHTTPHeader(os, contentType);
       writeContent(os);
       os.flush();
       socket.close();
@@ -69,7 +75,7 @@ public void run()
 /**
 * Read the HTTP request header.
 **/
-private void readHTTPRequest(InputStream is)
+private String readHTTPRequest(InputStream is)
 {
    String line;
    BufferedReader r = new BufferedReader(new InputStreamReader(is));
@@ -91,7 +97,7 @@ private void readHTTPRequest(InputStream is)
          break;
       }
    }
-   return;
+   return file;
 }
 
 /**
