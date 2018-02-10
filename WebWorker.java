@@ -60,6 +60,8 @@ public void run()
       
       if (path.toLowerCase().contains(".gif"))
          contentType = "image/gif";
+      else
+         contentType = "text/html";
       
       writeHTTPHeader(os, contentType);
       writeContent(os);
