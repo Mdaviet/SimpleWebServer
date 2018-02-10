@@ -68,7 +68,7 @@ public void run()
          contentType = "text/html";
       
       writeHTTPHeader(os, contentType);
-      writeContent(os);
+      writeContent(os, contentType);
       os.flush();
       socket.close();
    } catch (Exception e) {
@@ -148,7 +148,7 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
 * be done after the HTTP header has been written out.
 * @param os is the OutputStream object to write to
 **/
-private void writeContent(OutputStream os) throws Exception
+private void writeContent(OutputStream os, String contentType) throws Exception
 {
     File file2 = new File(file);
     BufferedReader br = null;
@@ -159,29 +159,44 @@ private void writeContent(OutputStream os) throws Exception
     df.setTimeZone(TimeZone.getTimeZone("GMT"));
    
    
-    
+   if (contentType.equals("text/html")) { 
+      
+      try {
+         FileReader read = new FileReader(file);
+         String text = "";
+            br = new BufferedReader( new FileReader(file2));
+            // Read data from routed file
+            while ((text = br.readLine()) != null && (file2.exists() == true)) {
+             os.write( br.readLine().getBytes());
+             
+             // find tag and print date strings
+             if (text.equals("\t<cs371date>"))
+               os.write((df.format(d)).getBytes());
+             
+             // find tags and print server messages
+             if (text.equals("\t<cs371server>"))
+               os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
+            }
+      } catch (FileNotFoundException e){
+          // display 404 error when file does not exist
+            System.err.println("File Not Found: " + file2);
+            os.write("HTTP/1.1 404 Not Found\n".getBytes());
+      } 
+   }// end if
    
-   try {
-      FileReader read = new FileReader(file);
-      String text = "";
-         br = new BufferedReader( new FileReader(file2));
-         // Read data from routed file
-         while ((text = br.readLine()) != null && (file2.exists() == true)) {
-          os.write( br.readLine().getBytes());
-          
-          // find tag and print date strings
-          if (text.equals("\t<cs371date>"))
-            os.write((df.format(d)).getBytes());
-          
-          // find tags and print server messages
-          if (text.equals("\t<cs371server>"))
-            os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
-         }
-   } catch (FileNotFoundException e){
-       // display 404 error when file does not exist
-         System.err.println("File Not Found: " + file2);
-         os.write("HTTP/1.1 404 Not Found\n".getBytes());
-   } 
+   else if (contentType.contains("image")) {
+      
+      // take inputs
+      FileInputStream imageInputReader = new FileInputStream (file2);
+      byte bytes [] = new byte [(int)file2.length()];
+      imageInputReader.read(bytes);
+      
+      // give outputs
+      DataOutputStream outputImage = new DataOutputStream(os);
+      outputImage.write(bytes);
+   }
+   
+   
    
    
   /*  os.write("<html><head></head><body>\n".getBytes());
