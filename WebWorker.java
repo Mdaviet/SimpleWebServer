@@ -49,13 +49,26 @@ public WebWorker(Socket s)
 **/
 public void run()
 {
+   String contentType = "";
+   String path = "";
+   
    System.err.println("Handling connection...");
    try {
       InputStream  is = socket.getInputStream();
       OutputStream os = socket.getOutputStream();
-      readHTTPRequest(is);
-      writeHTTPHeader(os,"text/html");
-      writeContent(os);
+      path = readHTTPRequest(is);
+      
+      if (path.toLowerCase().contains(".gif"))
+         contentType = "image/gif";
+      else if (path.toLowerCase().contains(".png"))
+         contentType = "image/png";
+      else if (path.toLowerCase().contains(".jpg"))
+         contentType = "image/jpg";
+      else
+         contentType = "text/html";
+      
+      writeHTTPHeader(os, contentType);
+      writeContent(os, contentType);
       os.flush();
       socket.close();
    } catch (Exception e) {
@@ -68,7 +81,7 @@ public void run()
 /**
 * Read the HTTP request header.
 **/
-private void readHTTPRequest(InputStream is)
+private String readHTTPRequest(InputStream is)
 {
    String line;
    BufferedReader r = new BufferedReader(new InputStreamReader(is));
@@ -90,7 +103,7 @@ private void readHTTPRequest(InputStream is)
          break;
       }
    }
-   return;
+   return file;
 }
 
 /**
@@ -135,7 +148,7 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
 * be done after the HTTP header has been written out.
 * @param os is the OutputStream object to write to
 **/
-private void writeContent(OutputStream os) throws Exception
+private void writeContent(OutputStream os, String contentType) throws Exception
 {
     File file2 = new File(file);
     BufferedReader br = null;
@@ -145,35 +158,46 @@ private void writeContent(OutputStream os) throws Exception
     DateFormat df = DateFormat.getDateTimeInstance();
     df.setTimeZone(TimeZone.getTimeZone("GMT"));
    
-   FileReader read = new FileReader(file);
-   String text = "";
-   if (file2.exists() == true) {
-        br = new BufferedReader( new FileReader(file2));
-    }
-    
-    // display 404 error when file does not exist
-   else {
-      System.err.println("File Not Found: " + file2);
-      os.write("HTTP/1.1 404 Not Found\n".getBytes());
+   
+   if (contentType.equals("text/html")) { 
+      
+      try {
+         FileReader read = new FileReader(file);
+         String text = "";
+            br = new BufferedReader( new FileReader(file2));
+            // Read data from routed file
+            while ((text = br.readLine()) != null && (file2.exists() == true)) {
+             os.write( br.readLine().getBytes());
+             
+             // find tag and print date strings
+             if (text.equals("\t<cs371date>"))
+               os.write((df.format(d)).getBytes());
+             
+             // find tags and print server messages
+             if (text.equals("\t<cs371server>"))
+               os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
+            }
+      } catch (FileNotFoundException e){
+          // display 404 error when file does not exist
+            System.err.println("File Not Found: " + file2);
+            os.write("HTTP/1.1 404 Not Found\n".getBytes());
+      } 
+   }// end if
+   
+   else if (contentType.contains("image")) {
+      
+      // take inputs
+      FileInputStream imageInputReader = new FileInputStream (file2);
+      byte bytes [] = new byte [(int)file2.length()];
+      imageInputReader.read(bytes);
+      
+      // give outputs
+      DataOutputStream outputImage = new DataOutputStream(os);
+      outputImage.write(bytes);
    }
    
-   /* try {
-   } catch (FileNotFoundException e){
-        
-   } */
    
-   // Read data from routed file
-   while ((text = br.readLine()) != null && (file2.exists() == true)) {
-    os.write( br.readLine().getBytes());
-    
-    // find tag and print date strings
-    if (text.equals("\t<cs371date>"))
-      os.write((df.format(d)).getBytes());
-    
-    // find tags and print server messages
-    if (text.equals("\t<cs371server>"))
-      os.write("<br>\nMichael's Simply Amazing Server!\n</br>".getBytes());
-   }
+   
    
   /*  os.write("<html><head></head><body>\n".getBytes());
    os.write("<h3>My web server works!</h3>\n".getBytes());
